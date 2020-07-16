@@ -15,10 +15,11 @@ const LaunchType = new GraphQLObjectType({
     fields: () => ({
         id: { type: GraphQLString },
         flight_number: { type: GraphQLInt },
-        name: { type: GraphQLString },
-        date_local: { type: GraphQLString },
-        success: { type: GraphQLBoolean },
-        rocket: { type: GraphQLString }
+        mission_name: { type: GraphQLString },
+        launch_year: { type: GraphQLString },
+        launch_date_local: { type: GraphQLString },
+        launch_success: { type: GraphQLBoolean },
+        rocket: { type: RocketType }
     })
 });
 
@@ -26,14 +27,9 @@ const LaunchType = new GraphQLObjectType({
 const RocketType = new GraphQLObjectType({
     name: 'Rocket',
     fields: () => ({
-        id: { type: GraphQLInt },
-        cost_per_launch: { type: GraphQLInt },
-        country: { type: GraphQLString },
-        first_flight: { type: GraphQLString },
         rocket_id: { type: GraphQLString },
         rocket_name: { type: GraphQLString },
         rocket_type: { type: GraphQLString },
-        description: { type: GraphQLString }
     })
 });
 
@@ -45,18 +41,18 @@ const RootQuery = new GraphQLObjectType({
             type: new GraphQLList(LaunchType),
             resolve: (parent, args) => {
                 return axios
-                        .get('https://api.spacexdata.com/v4/launches/')
+                        .get('https://api.spacexdata.com/v3/launches')
                         .then(res => res.data);
             } 
         },
         launch: {
             type: LaunchType,
             args: {
-                id: { type: GraphQLString }
+                flight_number: { type: GraphQLInt }
             },
             resolve: (parent, args) => {
                 return axios
-                        .get(`https://api.spacexdata.com/v4/launches/${args.id}`)
+                        .get(`https://api.spacexdata.com/v3/launches/${args.flight_number}`)
                         .then(res => res.data);
             }
         },
@@ -71,11 +67,11 @@ const RootQuery = new GraphQLObjectType({
         rocket: {
             type: RocketType,
             args: {
-                id: { type: GraphQLString }
+                rocket_id: { type: GraphQLString }
             },
             resolve: (parent, args) => {
                 return axios
-                        .get(`https://api.spacexdata.com/v3/rockets/${args.id}`)
+                        .get(`https://api.spacexdata.com/v3/rockets/${args.rocket_id}`)
                         .then(res => res.data);
             }
         }
